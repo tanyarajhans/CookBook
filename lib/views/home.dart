@@ -9,9 +9,13 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+
+  TextEditingController textEditingController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return MaterialApp(
+      home: Scaffold(
       body: Stack(
         children: [
           Container(
@@ -63,12 +67,52 @@ class _HomeState extends State<Home> {
                   color: Colors.blue[900],
                   fontSize: 18.0,
                   fontWeight: FontWeight.w600
-                )),
+                )
+              ),
+              SizedBox(
+                height: 30.0,
+            ),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Enter ingredients',
+                      hintStyle: TextStyle(
+                        fontSize: 18.0
+                      ) 
+                    ),
+                    controller: textEditingController,
+                  )
+                  ),
+                  SizedBox(
+                    width: 15.0,
+                  ),
+                  InkWell(
+                    onTap: (){
+                      if(textEditingController.text.isNotEmpty){
+                        print('do it');
+                      }
+                      else
+                      print('not do it');
+                    },
+                    child: Container(
+                      child: Icon(Icons.search,
+                      size: 33.0,
+                      color: Colors.white),
+                  )
+                )
+                  ],
+                )
+              )
         ],
        )
       ),
       ]
     )
+      )
     );
   }
 }
