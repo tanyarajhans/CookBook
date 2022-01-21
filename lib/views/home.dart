@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:http/http.dart' as http;
 
 class Home extends StatefulWidget {
   const Home({ Key? key }) : super(key: key);
@@ -11,6 +12,15 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
 
   TextEditingController textEditingController = TextEditingController();
+
+  String applicationId = "ae8c805f";
+  String apiKey ="f5efd0dd45f47e77bd4d8a5d74191db3";
+
+  getRecipes(String food) async {
+    String url = "https://api.edamam.com/search?q=$food&app_id=$applicationId&app_key=$apiKey";
+    var response = await http.get(Uri.parse(url));
+    print(response.body);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,6 +103,7 @@ class _HomeState extends State<Home> {
                   InkWell(
                     onTap: (){
                       if(textEditingController.text.isNotEmpty){
+                        getRecipes(textEditingController.text);
                         print('do it');
                       }
                       else
