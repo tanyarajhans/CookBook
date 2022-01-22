@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
+
+import '../models/recipe_model.dart';
 
 class Home extends StatefulWidget {
   const Home({ Key? key }) : super(key: key);
@@ -11,6 +15,8 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
 
+  List<RecipeModel> recipes = [];
+
   TextEditingController textEditingController = TextEditingController();
 
   String applicationId = "ae8c805f";
@@ -18,8 +24,18 @@ class _HomeState extends State<Home> {
 
   getRecipes(String food) async {
     String url = "https://api.edamam.com/search?q=$food&app_id=$applicationId&app_key=$apiKey";
+
     var response = await http.get(Uri.parse(url));
-    print(response.body);
+    Map<String, dynamic> jsonData = jsonDecode(response.body);
+
+    jsonData['hits'].forEach((element){
+      if(element['recipe']!=null){
+        RecipeModel recipeModel = RecipeModel.fromMap(element['recipe']);
+        recipes.add(recipeModel);
+      }
+    });
+
+    print(recipes.toString());
   }
 
   @override
@@ -124,6 +140,28 @@ class _HomeState extends State<Home> {
       ]
     )
       )
+    );
+  }
+}
+
+class RecipeTile extends StatelessWidget {
+  String url;
+  String source;
+  String title;
+  String postUrl;
+
+  RecipeTile(this.url, this.source, this.title, this.postUrl);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Stack(children: [
+          Image.network(url),
+          Container(
+            child: 
+          ),
+        ]
+      ,)
     );
   }
 }
