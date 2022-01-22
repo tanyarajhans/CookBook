@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class RecipeView extends StatefulWidget {
 
   final String postUrl;
+  
 
   RecipeView(this.postUrl);
   @override
@@ -11,11 +15,28 @@ class RecipeView extends StatefulWidget {
 }
 
 class _State extends State<RecipeView> {
+  late String finalUrl;
+  final Completer<WebViewController> _controller = Completer<WebViewController>();
+  @override
+  void initState(){
+    if(widget.postUrl.contains("http://")){
+      finalUrl=widget.postUrl.replaceAll("http://", "https://");
+    }else{
+      finalUrl=widget.postUrl;
+    }
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(children: [
+    return Scaffold(
+      body: Container(
+      child: Column(
+        children: <Widget>[
+        Column(
+        children: [
         Container(
+          color: Colors.black,
+          padding: EdgeInsets.only(top: 60.0, right: 20.0, left: 20.0, bottom: 10.0),
           width: MediaQuery.of(context).size.width,
           child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -36,8 +57,24 @@ class _State extends State<RecipeView> {
               ],
              )
             ),
-            
-      ],)
+
+      ],),
+      Container(
+        height: MediaQuery.of(context).size.height-110,
+        width: MediaQuery.of(context).size.width,
+        child:
+      WebView(
+        initialUrl: finalUrl,
+        javascriptMode: JavascriptMode.unrestricted,
+        onWebViewCreated: (WebViewController webViewController){
+          setState(() {
+            _controller.complete(webViewController);
+          });
+        }
+      ))
+      ]
+    ))
+      
     );
   }
 }

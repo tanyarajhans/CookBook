@@ -35,7 +35,9 @@ class _HomeState extends State<Home> {
         recipes.add(recipeModel);
       }
     });
-
+    setState(() {
+      
+    });
     print(recipes.toString());
   }
 
