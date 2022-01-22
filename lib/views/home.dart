@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
-
+import 'package:url_launcher/url_launcher.dart';
+import 'recipe_view.dart';
 import '../models/recipe_model.dart';
 
 class Home extends StatefulWidget {
@@ -55,8 +56,10 @@ class _HomeState extends State<Home> {
               ])
             ),
         ),
-        Container(
-          padding: EdgeInsets.symmetric(vertical: 60.0, horizontal: 30.0),
+        SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Container(
+          padding: EdgeInsets.symmetric(vertical: 60.0, horizontal: 20.0),
         child: Column(
           children: <Widget>[
             Row(
@@ -133,35 +136,118 @@ class _HomeState extends State<Home> {
                 )
                   ],
                 )
+              ),
+              Container(
+                child: GridView(
+                shrinkWrap: true,
+                scrollDirection: Axis.vertical,
+                physics: ClampingScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 200.0,
+                  mainAxisSpacing: 10.0
+                ),
+                children: List.generate(recipes.length, (index){
+                  return GridTile(child: RecipeTile(
+                    recipes[index].url, 
+                    recipes[index].source,
+                    recipes[index].label, 
+                    recipes[index].image, 
+                    
+                    
+                    )
+                    );
+                 }
+                ),
               )
+              )
+            
         ],
        )
-      ),
+      )),
       ]
     )
       )
     );
   }
 }
-
-class RecipeTile extends StatelessWidget {
+class RecipeTile extends StatefulWidget {
   String url;
-  String source;
+  String desc;
   String title;
   String postUrl;
 
-  RecipeTile(this.url, this.source, this.title, this.postUrl);
+  RecipeTile(this.url, this.desc, this.title, this.postUrl);
+
+  @override
+  _RecipeTileState createState() => _RecipeTileState();
+}
+
+class _RecipeTileState extends State<RecipeTile> {
+
+  _launchUrl(String url) async{
+    if(await canLaunch(url)){
+      await launch(url);
+    }
+    else{
+      throw "Couldn't launch URL";
+    }
+      
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Stack(children: [
-          Image.network(url),
-          Container(
-            child: 
-          ),
-        ]
-      ,)
+    return Wrap(
+      children:[
+        GestureDetector(
+          onTap: (){
+            if(kIsWeb)
+              _launchUrl(widget.url);
+            else{
+              print(widget.url);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => RecipeView(widget.url)));
+            }
+          },
+          child: Container(
+            margin: EdgeInsets.all(8.0),
+            child: Stack(children: [
+              Image.network(widget.postUrl,
+              height: 200,
+              width:200,
+              fit: BoxFit.cover),
+              Container(
+            
+            width: 200,
+            alignment: Alignment.bottomLeft,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [Colors.white30, Colors.white],
+              begin: FractionalOffset.centerRight,
+              end: FractionalOffset.centerLeft
+              )
+            ),
+            
+            child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.title,
+                    style: TextStyle()
+                  ),
+                  Text(
+                    widget.desc,
+                    style: TextStyle()
+                  ),
+                ],
+              )
+              )
+            )
+            
+            ]
+            )
+          )
+        )
+      ]
     );
   }
 }
